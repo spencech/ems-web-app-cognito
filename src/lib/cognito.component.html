@@ -1,0 +1,100 @@
+<form *ngIf="showForm && formType === CognitoFormType.Login" class="cognito-form" (submit)="login()">
+	<div *ngIf="prompt" class="prompt" [innerHtml]="prompt"></div>
+	<div class="cognito-formrow">
+		<label class="cognito-label" for="username">{{ strings.labelEmail }}</label>
+		<input id="username" class="cognito-input cognito-text" type="text" name="username" [(ngModel)]="model.username"/>
+	</div>
+	<div class="cognito-formrow">
+		<label class="cognito-label" for="password">{{ strings.labelPassword }}</label>
+		<input id="password" autocomplete="off" class="cognito-input cognito-text" type="password" name="password" [(ngModel)]="model.password"/>
+	</div>
+	<div class="cognito-buttons">
+		<button type="button" class="a" (click)="onForgotPassword($event)">{{ strings.labelForgotPassword }}</button>
+		<input class="cognito-input cognito-submit cognito-button" type="submit" [value]="strings.labelSubmit"/>
+	</div>	
+	<div *ngIf="error" class="error" [innerHtml]="error"></div>
+</form>
+<form *ngIf="showForm && formType === CognitoFormType.NewUser" class="cognito-form" (submit)="onNewUser()">
+	<div class="cognito-formrow">
+		<label class="cognito-label" for="username">{{ strings.labelEmail }}</label>
+		<input id="username" class="cognito-input cognito-text" type="text" name="username" [(ngModel)]="model.username" disabled />
+	</div>
+	<div class="cognito-formrow">
+		<label class="cognito-label no-mb" for="new-password">{{ strings.labelNewPassword }}</label>
+		<p class="cognito-sublabel">{{ strings.labelPasswordRequirement }}</p>
+		<input id="new-password" autocomplete="off" class="cognito-input cognito-text" type="password" name="password-new" [(ngModel)]="model.newPassword"/>
+	</div>
+	<div class="cognito-formrow">
+		<label class="cognito-label" for="password-confirm">{{ strings.labelConfirmNewPassword }}</label>
+		<input id="password-confirm" autocomplete="off" class="cognito-input cognito-text" type="password" name="password-confirm" [(ngModel)]="model.newPasswordConfirm"/>
+	</div>
+	<div class="cognito-formrow" *ngFor="let row of rows">
+		<label class="cognito-label" for="username">{{ row.label|labeler }}</label>
+		<input [id]="row.key"  class="cognito-input cognito-text" type="text" [name]="row.key" [(ngModel)]="model[row.key]"/>
+	</div>
+	<div class="cognito-buttons">
+		<input class="cognito-input cognito-submit cognito-button" type="submit" [disabled]="newUserFormDisabled()" [value]="strings.labelSubmit"/>
+	</div>	
+	<div *ngIf="error" class="error" [innerHtml]="error"></div>
+</form>
+<form *ngIf="showForm && formType === CognitoFormType.ForcePasswordReset" class="cognito-form" (submit)="onForcePasswordReset()">
+	<div *ngIf="prompt" class="prompt" [innerHtml]="prompt"></div>
+	<div class="cognito-formrow">
+		<label class="cognito-label" for="username">{{ strings.labelEmail }}</label>
+		<input id="username" class="cognito-input cognito-text" type="text" name="username" [(ngModel)]="model.username" disabled />
+	</div>
+	<div class="cognito-formrow">
+		<label class="cognito-label" for="code">{{ strings.labelCode }}</label>
+		<input id="code" autocomplete="off" class="cognito-input cognito-text" type="text" name="code" [(ngModel)]="model.code"/>
+	</div>
+	<div class="cognito-formrow">
+		<label class="cognito-label" for="new-password">{{ strings.labelNewPassword }}</label>
+		<p class="cognito-sublabel">{{ strings.labelPasswordRequirement }}</p>
+		<input id="new-password" autocomplete="off" class="cognito-input cognito-text" type="password" name="password-new" [(ngModel)]="model.newPassword"/>
+	</div>
+	<div class="cognito-formrow">
+		<label class="cognito-label" for="password-confirm">{{ strings.labelConfirmNewPassword }}</label>
+		<input id="password-confirm" autocomplete="off" class="cognito-input cognito-text" type="password" name="password-confirm" [(ngModel)]="model.newPasswordConfirm"/>
+	</div>
+	<div class="cognito-buttons">
+		<input class="cognito-input cognito-submit cognito-button" type="submit" [disabled]="newUserFormDisabled()" [value]="strings.labelSubmit"/>
+	</div>	
+	<div *ngIf="error" class="error" [innerHtml]="error"></div>
+</form>
+<form *ngIf="showForm && formType === CognitoFormType.UserVerificationRequest" class="cognito-form" (submit)="onRequestVerificationCode()">
+	<div *ngIf="prompt" class="prompt" [innerHtml]="prompt"></div>
+	<div class="cognito-formrow">
+		<label class="cognito-label" for="username">{{ strings.labelEmail }}</label>
+		<input id="username" class="cognito-input cognito-text" type="text" name="username" [(ngModel)]="model.username"/>
+	</div>
+	<div class="cognito-buttons">
+		<input class="cognito-input cognito-submit cognito-button" type="submit" [disabled]="!model.username" [value]="strings.labelSubmit"/>
+	</div>	
+	<div *ngIf="error" class="error" [innerHtml]="error"></div>
+</form>
+<form *ngIf="showForm && formType === CognitoFormType.UserPasswordReset" class="cognito-form" (submit)="onUserPasswordReset()">
+	<div *ngIf="prompt" class="prompt" [innerHtml]="prompt"></div>
+	<div class="cognito-formrow">
+		<label class="cognito-label" for="current-password">{{ strings.labelCurrentPassword }}</label>
+		<input id="current-password" autocomplete="off" class="cognito-input cognito-text" type="password" name="password" [(ngModel)]="model.password"/>
+	</div>
+	<div class="cognito-formrow">
+		<label class="cognito-label" for="new-password">{{ strings.labelNewPassword }}</label>
+		<p class="cognito-sublabel">{{ strings.labelPasswordRequirement }}</p>
+		<input id="new-password" autocomplete="off" class="cognito-input cognito-text" type="password" name="password-new" [(ngModel)]="model.newPassword"/>
+	</div>
+	<div class="cognito-formrow">
+		<label class="cognito-label" for="password-confirm">{{ strings.labelConfirmNewPassword }}</label>
+		<input id="password-confirm" autocomplete="off" class="cognito-input cognito-text" type="password" name="password-confirm" [(ngModel)]="model.newPasswordConfirm"/>
+	</div>
+	<div class="cognito-buttons">
+		<input class="cognito-input cognito-submit cognito-button" type="submit" [disabled]="newUserFormDisabled()" [value]="strings.labelSubmit"/>
+	</div>	
+	<div *ngIf="error" class="error" [innerHtml]="error"></div>
+</form>
+<form *ngIf="showForm && formType === CognitoFormType.PasswordUpdateSuccessful" class="cognito-form" (submit)="showForm = false">
+	<div class="prompt" [innerHtml]="prompt"></div>
+	<div class="cognito-buttons">
+		<input class="cognito-input cognito-submit cognito-button" type="submit" [value]="strings.labelClose"/>
+	</div>	
+</form>

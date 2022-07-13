@@ -1,0 +1,106 @@
+:host {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	z-index: 0;
+	opacity: 0;
+	justify-content: center;
+	align-items: center;
+	pointer-events: none;
+	color: #4d4d4d;
+
+	p {
+		margin: 0;
+		padding: 0;
+	}
+}
+
+:host.render {
+	opacity: 1;
+	transition: opacity 1s;
+	pointer-events: auto;
+}
+
+.cognito-form {
+	background: white;
+	transition: all 0.25s;
+	box-sizing: border-box;
+	padding: 2rem 1rem;
+	width: ~'calc(100% - 2rem)';
+	max-height: ~'calc(100% - 2rem)';
+	max-width: 30rem;
+	overflow: auto;
+	border: solid 1px #ccc;
+	box-shadow: 0 0 8px 2px rgba(0,0,0,0.05);
+}
+
+:host.transitioning .cognito-form {
+	opacity: 0;
+	transition: all 0.25s;
+	pointer-events: none;
+}
+
+.cognito-form .prompt {
+	font-weight: bold;
+	font-style: italic;
+	margin-bottom: 1rem;
+	text-align: center;
+}
+
+.cognito-form .error {
+	font-style: italic;
+	color: red;
+	text-align: center;
+	margin-top: 1rem;
+}
+
+.cognito-label {
+	display: block;
+	text-transform: uppercase;
+	font-family: inherit;
+	font-size: 0.875rem;
+	font-weight: bold;
+}
+
+:host p.cognito-sublabel {
+	font-size: 14px;
+	font-style: italic;
+	margin-left: 1rem;
+}
+
+
+.cognito-text {
+	display: block;
+	width: 100%;
+	font-size: 1.125rem;
+	padding: 0.25rem;
+	box-sizing: border-box;
+	color: inherit;
+	font-family: inherit;
+	margin-top: 0.5rem;
+}
+
+.cognito-formrow + .cognito-formrow {
+	margin-top: 1.25rem;
+}
+
+.cognito-buttons {
+	margin-top: 2rem;
+	text-align: center;
+}
+
+.cognito-buttons button + button,
+.cognito-buttons button + input {
+	margin-left: 2rem;
+}
+
+.cognito-buttons button.a {
+	appearance: none;
+	background: none;
+	border: 0;
+	text-decoration: underline;
+	cursor: pointer;
+}
