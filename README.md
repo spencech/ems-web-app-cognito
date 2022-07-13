@@ -2,7 +2,7 @@
 
 **Note:** This module has peer dependencies on AWS packages.
 
-	npm i aws-sdk amazon-cognito-identity-js  ems-web-app-cognito
+	npm i aws-sdk amazon-cognito-identity-js cross-fetch ems-web-app-cognito
 
 The Cognito Angular.io module is authored for use within web applications developed by [Educational Media Solutions](https://educationalmediasolutions.com).
 
