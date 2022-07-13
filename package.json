@@ -1,6 +1,6 @@
 {
   "name": "ems-web-app-cognito",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Chris Spence (https://educationalmediasolutions.com)",
   "description": "This angular.io module includes a component, service and supporting classes that wrap the Amazon Cognito Identity SDK to enable simple username/password authentication.",
   "funding": "https://paypal.me/spencech",
