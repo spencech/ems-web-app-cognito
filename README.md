@@ -78,7 +78,7 @@ Supply your user pool and app client id in the attributes above. It is strongly 
 	      delay(() => this.authenticated = session ? true : false);
 	    });
 
-	    //argument is a CognitoUser obejct from AWS sdk
+	    // argument is a CognitoUser obejct from AWS sdk
 	    this.cognito.user$.subscribe(user => {
 	    	console.log(user);
 	    });
