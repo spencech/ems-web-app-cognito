@@ -18,7 +18,7 @@ Styling is intentionally bare, you will need to customize the CSS to suit your U
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.0.
 
-## Index.html
+## Update to index.html
 
 **Note:** The Cognito SDK complains about a missing global property on the window; to hack a fix for this, add the below to the head tag of your index.html file
 
