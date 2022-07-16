@@ -1,10 +1,11 @@
 import { Component, OnInit, HostBinding, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
 import { CognitoService } from "./cognito.service";
-import { CognitoUser, CognitoUserSession }  from 'amazon-cognito-identity-js';
-import { ICognitoResponse } from "./cognito.interfaces";
+import { CognitoUser, CognitoUserSession, CognitoIdToken, CognitoAccessToken }  from 'amazon-cognito-identity-js';
+import { ICognitoResponse, ICognitoUserData } from "./cognito.interfaces";
 import { CognitoStrings } from "./cognito.classes";
 import { CognitoResponseType, CognitoRequestType, CognitoFormType } from "./cognito.types";
-import { unsnake, tick } from "./cognito.utils";
+import { unsnake, tick, params } from "./cognito.utils";
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -21,13 +22,14 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
   @Input("pool-id") poolId!: string;
   @Input("client-id") clientId!: string;
+  @Input("cognito-signin-url") cognitoUrl?: string;
   @Input("region") region!: string;
   @Input("modal-background") modalBackground: string = "rgba(255,255,255,0.5)";
   @Input("z-index") zIndex: number = 1000;
 
   @Output("ready") onReady: EventEmitter<any> = new EventEmitter();
   @Output("connecting") onConnecting: EventEmitter<boolean> = new EventEmitter();
-  @Output("authenticated") onAuthenticated: EventEmitter<CognitoUser | null> = new EventEmitter();
+  @Output("authenticated") onAuthenticated: EventEmitter<ICognitoUserData | null> = new EventEmitter();
 
   public model: any = { username: null, password: null};
   public componentStyle: Record<string, string | number> = {};
@@ -64,9 +66,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    if(this.session) {
-      setTimeout(() => this.onAuthenticated.emit(this.user));
-    }
+    setTimeout(() => this.initialize());
   }
 
   async login() {
@@ -190,6 +190,29 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     return disabled;
   }
 
+  private async initialize() {
+
+
+    try {
+      if(this.cognitoUrl && localStorage.getItem("ems_access_token")) {
+        
+        const info = await this.cognito.getUserInfo(this.cognitoUrl) as ICognitoUserData;
+
+        //emulate cognito user/session for federated login
+        this.session = new CognitoUserSession({
+          IdToken: new CognitoIdToken({ IdToken: info.idToken }),
+          AccessToken: new CognitoAccessToken({ AccessToken: info.accessToken }),
+        });
+        this.cognito.createFederatedSession(info.idToken, info.accessToken)
+      }
+    } catch (error: any) {
+    } finally {
+      if(this.session) {
+        this.onAuthenticated.emit(this.getUserData());
+      }
+    }
+  }
+
   private async handleResponse(response: ICognitoResponse) {
     this.transitioning = true;
     
@@ -206,7 +229,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
       this.prompt = CognitoStrings.onFirstLogin;
       this.showPasswordResetForm(response); //new user
     } else if(!response.error?.code && response.request === CognitoRequestType.Authentication) {
-      this.onAuthenticated.emit(response.user); //connected
+      this.onAuthenticated.emit(this.getUserData()); //connected
       this.showForm = false;
       this.connectionComplete();
     } else {
@@ -246,6 +269,10 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
   private async showCurrentForm() {
     if(!this.formType) return;
+
+    if(this.formType === CognitoFormType.GoogleSignIn) {
+      return this.signInWithGoogle();
+    }
 
     this.hostStyle = {
       "background": this.modalBackground,
@@ -293,6 +320,23 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     const attributes = {} as Record<string,string>;
     this.cache!.requiredAttributes!.forEach(key => attributes[key] = this.model[key]);
     return attributes;
+  }
+
+  private signInWithGoogle() {
+    const url = `${this.cognitoUrl}/oauth2/authorize?identity_provider=Google&redirect_uri=${window.location.origin}&response_type=TOKEN&client_id=${this.clientId}&scope=email openid profile aws.cognito.signin.user.admin`;
+    window.location.href = url;
+  }
+
+  private getUserData(): ICognitoUserData {
+    return {
+      email: this.session!.getIdToken().payload["email"],
+      username: this.session!.getIdToken().payload["cognito:username"],
+      sub:  this.session!.getIdToken().payload["sub"],
+      firstName: this.session!.getIdToken().payload["given_name"],
+      lastName: this.session!.getIdToken().payload["family_name"],
+      idToken:  this.session!.getIdToken().getJwtToken(),
+      accessToken:  this.session!.getAccessToken().getJwtToken(),
+    }
   }
 
 }

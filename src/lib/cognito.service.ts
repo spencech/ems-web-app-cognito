@@ -3,9 +3,10 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpRequest, HttpErrorResponse, 
 import { Observable, Subject, BehaviorSubject, throwError, of } from 'rxjs';
 import { catchError, map, tap, take } from "rxjs/operators";
 import 'cross-fetch/polyfill';
-import { CognitoUser, CognitoUserPool, CognitoUserSession, AuthenticationDetails }  from 'amazon-cognito-identity-js';
-import { ICognitoResponse } from "./cognito.interfaces";
+import { CognitoUser, CognitoUserPool, CognitoUserSession, CognitoIdToken, CognitoAccessToken, CognitoRefreshToken, AuthenticationDetails }  from 'amazon-cognito-identity-js';
+import { ICognitoResponse, ICognitoUserData } from "./cognito.interfaces";
 import { CognitoResponseType, CognitoRequestType, CognitoFormType } from "./cognito.types";
+import { params } from "./cognito.utils";
 
 @Injectable({
   providedIn: 'root'
@@ -25,15 +26,58 @@ export class CognitoService {
   private user: CognitoUser | null = null;
   private pool!: CognitoUserPool;
 
-  constructor() {
+  private accessToken?: string;
+  private idToken?: string;
+
+  constructor(private http: HttpClient) {
 
   }
 
   public initialize(UserPoolId: string, ClientId: string) {
+
+    //for federated users
+    const access = params("access_token") ?? localStorage.getItem("ems_access_token") ?? null;
+    const id = params("id_token") ?? localStorage.getItem("ems_id_token") ?? null;
+
+    if(access && id) {
+      localStorage.setItem("ems_access_token", access);
+      localStorage.setItem("ems_id_token", id);
+      window.location.hash = "";
+    } 
+
+    this.accessToken = access;
+    this.idToken = id;
+
+    //for srp users
     this.pool = new CognitoUserPool({ UserPoolId, ClientId });
     this.user = this.pool.getCurrentUser();
     this.userSource.next(this.user);
     this.user?.getSession((e: Error, session: null) => this.sessionSource.next(session));
+  }
+
+  public getUserInfo(url: string): Promise<ICognitoUserData | HttpErrorResponse | undefined> {
+    const request = `${url}/oauth2/userInfo`
+    const headers = this.headers();
+
+    return this.http.get(request, { headers, withCredentials: true } ).pipe(
+        map((result: any) => 
+          { return {
+            email: result.email,
+            username: result.username,
+            sub: result.sub,
+            firstName: result.given_name,
+            lastName: result.family_name,
+            accessToken: this.accessToken!,
+            idToken: this.idToken!
+          }}
+        )
+     ).toPromise();
+
+    //, catchError(this.handleErrorQuietly)
+  }
+
+  public setUserSession(session: CognitoUserSession) {
+    this.sessionSource.next(session);
   }
 
   public showForm(form: CognitoFormType | null) {
@@ -45,6 +89,8 @@ export class CognitoService {
       if(this.user) {
         this.userSource.next(null);
         this.sessionSource.next(null);
+        localStorage.removeItem("ems_id_token");
+        localStorage.removeItem("ems_access_token");
         this.user.globalSignOut({
           onSuccess: resolve,
           onFailure: () => {
@@ -70,6 +116,20 @@ export class CognitoService {
         if(!this.user) this.authenticateUser(user, details, resolve, reject);
         else this.getUserSession(resolve, reject)
     });
+  }
+
+  public createFederatedSession(IdToken: string, AccessToken: string) {
+
+    const session = new CognitoUserSession({
+          IdToken: new CognitoIdToken({ IdToken }),
+          AccessToken: new CognitoAccessToken({ AccessToken }),
+    });
+
+    const Username = session.getIdToken().payload["cognito:username"];
+    const data = { Username, Pool: this.pool };
+    this.user = new CognitoUser(data);
+    this.userSource.next(this.user);
+    this.sessionSource.next(session);
   }
 
   public completePasswordUpdate(password: string, user: CognitoUser, attributes: any): Promise<ICognitoResponse> {
@@ -117,7 +177,7 @@ export class CognitoService {
     const request = CognitoRequestType.ConfirmPassword;
     return new Promise((resolve: (result: ICognitoResponse) => void, reject: (result: ICognitoResponse) => void) => {
        user.confirmPassword(code, password, {
-         onSuccess: (response: any) => { console.log(response);  resolve({ type: CognitoResponseType.Success, user, request, session: null }) },
+         onSuccess: (response: any) => { resolve({ type: CognitoResponseType.Success, user, request, session: null }) },
          onFailure: (error: any) => reject({ type: CognitoResponseType.InvalidCode, error, user, request, session: null })
        })
     });
@@ -148,5 +208,17 @@ export class CognitoService {
         resolve({ type: CognitoResponseType.Authenticated, session, user: this.user!, request });
       }
     })
+  }
+
+  private handleErrorQuietly(error: HttpErrorResponse) {
+    return of(error);
+  }
+
+  private headers(custom: any = {}) {
+    const headers = { 
+          "Content-Type": "application/json",
+          "Authorization": this.accessToken ? `Bearer ${this.accessToken}` : ""
+       };
+    return new HttpHeaders(headers);
   }
 }

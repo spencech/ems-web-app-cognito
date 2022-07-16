@@ -10,3 +10,13 @@ export interface ICognitoResponse {
 	requiredAttributes?: string[]
 	error?: any
 }
+
+export interface ICognitoUserData {
+	accessToken: string,
+	idToken: string,
+	email: string,
+	username: string,
+	sub: string,
+	firstName: string,
+	lastName: string
+}

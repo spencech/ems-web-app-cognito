@@ -24,5 +24,6 @@ export enum CognitoFormType {
 	ForcePasswordReset = "force-password-reset",
 	UserPasswordReset = "user-password-reset",
 	UserVerificationRequest = "user-verification-request",
-	PasswordUpdateSuccessful = "password-update-successful"
+	PasswordUpdateSuccessful = "password-update-successful",
+	GoogleSignIn = "google-sign-in"
 }

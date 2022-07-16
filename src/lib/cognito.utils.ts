@@ -10,3 +10,18 @@ export function tick(duration: number = 0) {
 		window.setTimeout(() => resolve(duration), duration);
 	});
 }
+export function params(requestedProperty?: string): any {
+  const vars = {} as any;
+  const parts = window.location.href.replace(/[?&#]+([^=&]+)=([^&]*)/gi, ((m: any, key: string, value: any) => {
+    vars[key] = value;
+  }) as any);
+
+  for (const prop in vars) {
+    if (vars[prop].toLowerCase() === 'true') vars[prop] = true;
+    else if (vars[prop].toLowerCase() === 'false') vars[prop] = false;
+    else if (!isNaN(parseFloat(vars[prop])) && !vars[prop].match(/[^0-9]+/gim)) vars[prop] = parseFloat(vars[prop]);
+  }
+
+  if (requestedProperty) return vars[requestedProperty];
+  return vars;
+}

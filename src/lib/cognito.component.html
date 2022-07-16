@@ -1,4 +1,5 @@
 <form *ngIf="showForm && formType === CognitoFormType.Login" class="cognito-form" (submit)="login()">
+	<button class="button close" (click)="showForm=false" type="button"><span class="buttontext">{{ strings.labelClose }}</span></button>
 	<div *ngIf="prompt" class="prompt" [innerHtml]="prompt"></div>
 	<div class="cognito-formrow">
 		<label class="cognito-label" for="username">{{ strings.labelEmail }}</label>
@@ -15,6 +16,7 @@
 	<div *ngIf="error" class="error" [innerHtml]="error"></div>
 </form>
 <form *ngIf="showForm && formType === CognitoFormType.NewUser" class="cognito-form" (submit)="onNewUser()">
+	<button class="button close" (click)="showForm=false" type="button"><span class="buttontext">{{ strings.labelClose }}</span></button>
 	<div class="cognito-formrow">
 		<label class="cognito-label" for="username">{{ strings.labelEmail }}</label>
 		<input id="username" class="cognito-input cognito-text" type="text" name="username" [(ngModel)]="model.username" disabled />
@@ -38,6 +40,7 @@
 	<div *ngIf="error" class="error" [innerHtml]="error"></div>
 </form>
 <form *ngIf="showForm && formType === CognitoFormType.ForcePasswordReset" class="cognito-form" (submit)="onForcePasswordReset()">
+	<button class="button close" (click)="showForm=false" type="button"><span class="buttontext">{{ strings.labelClose }}</span></button>
 	<div *ngIf="prompt" class="prompt" [innerHtml]="prompt"></div>
 	<div class="cognito-formrow">
 		<label class="cognito-label" for="username">{{ strings.labelEmail }}</label>
@@ -62,6 +65,7 @@
 	<div *ngIf="error" class="error" [innerHtml]="error"></div>
 </form>
 <form *ngIf="showForm && formType === CognitoFormType.UserVerificationRequest" class="cognito-form" (submit)="onRequestVerificationCode()">
+	<button class="button close" (click)="showForm=false" type="button"><span class="buttontext">{{ strings.labelClose }}</span></button>
 	<div *ngIf="prompt" class="prompt" [innerHtml]="prompt"></div>
 	<div class="cognito-formrow">
 		<label class="cognito-label" for="username">{{ strings.labelEmail }}</label>
@@ -73,6 +77,7 @@
 	<div *ngIf="error" class="error" [innerHtml]="error"></div>
 </form>
 <form *ngIf="showForm && formType === CognitoFormType.UserPasswordReset" class="cognito-form" (submit)="onUserPasswordReset()">
+	<button class="button close" (click)="showForm=false" type="button"><span class="buttontext">{{ strings.labelClose }}</span></button>
 	<div *ngIf="prompt" class="prompt" [innerHtml]="prompt"></div>
 	<div class="cognito-formrow">
 		<label class="cognito-label" for="current-password">{{ strings.labelCurrentPassword }}</label>

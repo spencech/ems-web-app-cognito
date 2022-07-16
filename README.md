@@ -12,7 +12,7 @@ Find a [working example of this component here](https://ems-web-app.educationalm
 
 This package includes a component, service and supporting classes that wrap the [Amazon Cognito Identity SDK](https://www.npmjs.com/package/amazon-cognito-identity-js) to enable simple username/password authentication. 
 
-You must set up the User Pool, App Client and Identity Pool in Cognito; this package supports only SRP / email auth flow. This package will be extended as we encounter different auth needs.
+You must set up the User Pool, App Client and Identity Pool in Cognito; this package supports SRP auth flow (i.e., username/password with User Pool) and Google Sign In. This package will be extended as we encounter different auth needs.
 
 Styling is intentionally bare, you will need to customize the CSS to suit your UI requirements.
 
@@ -52,17 +52,18 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Component Implementation: Template Element
 
-	<cognito pool-id="us-east-1_xxxxxxxx" client-id="xxxxxxxxxxxxxxxxxxx" (connecting)="onConnecting($event)"></cognito>
+	<cognito pool-id="us-east-1_xxxxxxxx" client-id="xxxxxxxxxxxxxxxxxxx" cognito-signin-url="https://your-hosted-ui.auth.us-east-1.amazoncognito.com" (connecting)="onConnecting($event)"></cognito>
 
 Supply your user pool and app client id in the attributes above. It is strongly recommended that you use the `connecting` callback to render a loader/status indicator while the component engages with the server.
 
+The `cognito-signin-url` is optional and, when defined, will enable federated Google sign in (assuming you have configured this in your Cognito and Google Cloud consoles).
 
 ## Component Implementation: Script
 
 	import { Component, OnInit } from '@angular/core';
 	import { LoaderService, LoaderType } from "ems-web-app-loader";
 	import { delay } from "ems-web-app-utils";
-	import { CognitoService, CognitoFormType, CognitoStrings } from "ems-web-app-cognito";
+	import { CognitoService, CognitoFormType, CognitoStrings, ICognitoUserData } from "ems-web-app-cognito";
 
 	@Component({
 	  selector: 'app-root',
@@ -79,6 +80,8 @@ Supply your user pool and app client id in the attributes above. It is strongly 
 	  constructor(private loader: LoaderService, private cognito: CognitoService) {}
 
 	  ngOnInit() {
+	  	//you can subscribe to service observables to monitor state or you can use the event emitters below
+	  	
 	  	//indicates whether the user has an active session; undefined if not
 	  	//argument is a CognitoUserSession obejct from AWS sdk
 	  	//you can use this to get access and id tokens for interaction with other AWS resources
@@ -96,6 +99,11 @@ Supply your user pool and app client id in the attributes above. It is strongly 
 	  onConnecting(connecting: boolean) {
 	  	//renders a modal overlay whenever component indicates an active server transaction
 	    this.loader.load(connecting);
+	  }
+
+	  onAuthenticated(user: ICognitoUserData | null) {
+	  	//returns a cleaned up user data object
+	    console.log("authenticated", user);
 	  }
 
 	  login() {
