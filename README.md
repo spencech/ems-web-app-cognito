@@ -110,6 +110,10 @@ The `cognito-signin-url` is optional and, when defined, will enable federated Go
 	    this.cognito.showForm(CognitoFormType.Login);
 	  }
 
+	  loginWithGoogle() {
+	    this.cognito.showForm(CognitoFormType.GoogleSignIn);
+	  }
+
 	  changePassword() {
 	    this.cognito.showForm(CognitoFormType.UserPasswordReset);
 	  }
