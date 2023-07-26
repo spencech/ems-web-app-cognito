@@ -52,7 +52,7 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Component Implementation: Template Element
 
-	<cognito pool-id="us-east-1_xxxxxxxx" client-id="xxxxxxxxxxxxxxxxxxx" cognito-signin-url="https://your-hosted-ui.auth.us-east-1.amazoncognito.com" (connecting)="onConnecting($event)"></cognito>
+	<cognito pool-id="us-east-1_xxxxxxxx" provider-name="xxxxxxxxxxx" client-id="xxxxxxxxxxxxxxxxxxx" cognito-signin-url="https://your-hosted-ui.auth.us-east-1.amazoncognito.com" (connecting)="onConnecting($event)"></cognito>
 
 Supply your user pool and app client id in the attributes above. It is strongly recommended that you use the `connecting` callback to render a loader/status indicator while the component engages with the server.
 
