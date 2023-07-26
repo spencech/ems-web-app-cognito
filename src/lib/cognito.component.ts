@@ -21,6 +21,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @HostBinding("class.transitioning") transitioning: boolean = false;
 
   @Input("pool-id") poolId!: string;
+  @Input("provider-name") providerName: string = "Google";
   @Input("client-id") clientId!: string;
   @Input("cognito-signin-url") cognitoUrl?: string;
   @Input("region") region!: string;
@@ -323,7 +324,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   }
 
   private signInWithGoogle() {
-    const url = `${this.cognitoUrl}/oauth2/authorize?identity_provider=Google&redirect_uri=${window.location.origin}&response_type=TOKEN&client_id=${this.clientId}&scope=email openid profile aws.cognito.signin.user.admin`;
+    const url = `${this.cognitoUrl}/oauth2/authorize?identity_provider=${this.providerName}&redirect_uri=${window.location.origin}&response_type=TOKEN&client_id=${this.clientId}&scope=email openid profile aws.cognito.signin.user.admin`;
     window.location.href = url;
   }
 
