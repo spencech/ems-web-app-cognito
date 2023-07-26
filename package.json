@@ -20,7 +20,7 @@
     "url": "https://github.com/spencech/ems-web-app-cognito.git"
   },
   "scripts": {
-    "publish": "git add -A . && git commit -m 'prepublish npm package' && npm version patch && ng build cognito && cd dist && npm publish"
+    "publish": "git add -A . && git commit --allow-empty -m 'prepublish npm package' && npm version patch && ng build cognito && cd dist && npm publish"
   },
   "keywords": [
     "ems",
