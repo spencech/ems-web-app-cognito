@@ -31,6 +31,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @Output("ready") onReady: EventEmitter<any> = new EventEmitter();
   @Output("connecting") onConnecting: EventEmitter<boolean> = new EventEmitter();
   @Output("authenticated") onAuthenticated: EventEmitter<ICognitoUserData | null> = new EventEmitter();
+  @Output("response") onResponse: EventEmitter<any> = new EventEmitter(); 
 
   public model: any = { username: null, password: null};
   public componentStyle: Record<string, string | number> = {};
@@ -236,6 +237,8 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     } else {
       this.connectionComplete(); //unsupported response -- hopefully described in messaging
     }
+
+    this.onResponse.emit({ response, model });
   }
 
   private async initiatePasswordReset(response: ICognitoResponse) {
