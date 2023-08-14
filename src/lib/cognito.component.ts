@@ -238,7 +238,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
       this.connectionComplete(); //unsupported response -- hopefully described in messaging
     }
 
-    this.onResponse.emit({ response, model });
+    this.onResponse.emit({ response, model: this.model });
   }
 
   private async initiatePasswordReset(response: ICognitoResponse) {
