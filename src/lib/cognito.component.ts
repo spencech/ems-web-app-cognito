@@ -27,6 +27,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @Input("region") region!: string;
   @Input("modal-background") modalBackground: string = "rgba(255,255,255,0.5)";
   @Input("z-index") zIndex: number = 1000;
+  @Input("hook") hook?: (state: any) => Promise<boolean>;
 
   @Output("ready") onReady: EventEmitter<any> = new EventEmitter();
   @Output("connecting") onConnecting: EventEmitter<boolean> = new EventEmitter();
@@ -158,6 +159,11 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   }
 
   async onRequestVerificationCode() {
+
+    if(this.hook) {
+      const proceed = await this.hook({ "state": "request-verification-code", "username": this.model.username });
+      if(!proceed) return;
+    }
 
     this.onConnecting.emit(true);
     this.error = null;
