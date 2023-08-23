@@ -78,8 +78,9 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     this.error = null;
     
     try {
+      const username = this.model.username!.replace(/\s+/gim,"");
       this.onConnecting.emit(true);
-      response = await this.cognito.authenticate(this.model.username!, this.model.password!);
+      response = await this.cognito.authenticate(username, this.model.password!);
     } catch(e: any) {
       response = e;
     } finally {
@@ -88,14 +89,16 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   }
 
   async onNewUser() {
-    
+    console.log("on new user");
     let response: ICognitoResponse;
     this.error = null;
     
     try {
       this.onConnecting.emit(true);
       response = await this.cognito.completePasswordUpdate(this.model.newPassword!, this.cache!.user, this.getUserAttributes());
+      console.log("response", response);
     } catch(e: any) {
+      console.log("error",e);
       response = e;
     } finally {
       this.handleResponse(response!);
@@ -161,7 +164,8 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   async onRequestVerificationCode() {
 
     if(this.hook) {
-      const proceed = await this.hook({ "state": "request-verification-code", "username": this.model.username });
+      const username = this.model.username!.replace(/\s+/gim,"");
+      const proceed = await this.hook({ "state": "request-verification-code", "username": username });
       if(!proceed) return;
     }
 
@@ -169,7 +173,8 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     this.error = null;
     
     try {
-      const response = await this.cognito.requestVerificationCode(this.model.username);
+      const username = this.model.username!.replace(/\s+/gim,"");
+      const response = await this.cognito.requestVerificationCode(username);
       this.transitioning = true;
       await tick(250);
       this.setMessaging(response, CognitoStrings.onNewPasswordRequired);
@@ -225,6 +230,8 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     this.transitioning = true;
     
     await tick(250);
+
+    console.log("handling response", response);
     
     this.setMessaging(response);
     this.cache = response;
