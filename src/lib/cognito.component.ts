@@ -234,7 +234,8 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     console.log("handling response", response);
     
     this.setMessaging(response);
-    this.cache = response;
+    this.cache = response.userAttributes ? response : this.cache;
+    console.log(this.cache);
 
     if(response.error?.code === CognitoResponseType.NotAuthorized && response.request === CognitoRequestType.Authentication) {
       this.connectionComplete(); //likely bad password or too many attempts
