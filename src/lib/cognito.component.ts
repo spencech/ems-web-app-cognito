@@ -89,16 +89,13 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   }
 
   async onNewUser() {
-    console.log("on new user");
     let response: ICognitoResponse;
     this.error = null;
     
     try {
       this.onConnecting.emit(true);
       response = await this.cognito.completePasswordUpdate(this.model.newPassword!, this.cache!.user, this.getUserAttributes());
-      console.log("response", response);
     } catch(e: any) {
-      console.log("error",e);
       response = e;
     } finally {
       this.handleResponse(response!);
@@ -231,11 +228,8 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     
     await tick(250);
 
-    console.log("handling response", response);
-    
     this.setMessaging(response);
     this.cache = response.userAttributes ? response : this.cache;
-    console.log(this.cache);
 
     if(response.error?.code === CognitoResponseType.NotAuthorized && response.request === CognitoRequestType.Authentication) {
       this.connectionComplete(); //likely bad password or too many attempts
@@ -336,6 +330,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
   private getUserAttributes(): Record<string,string> {
     const attributes = {} as Record<string,string>;
+    if(!this.cache?.requiredAttributes) return attributes;
     this.cache!.requiredAttributes!.forEach(key => attributes[key] = this.model[key]);
     return attributes;
   }
