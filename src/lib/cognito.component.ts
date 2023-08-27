@@ -76,6 +76,11 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     
     let response: ICognitoResponse;
     this.error = null;
+
+    if(this.hook) {
+      const proceed = await this.hook({ "state": "before-login", model: this.model });
+      if(!proceed) return;
+    }
     
     try {
       const username = this.model.username!.replace(/\s+/gim,"");
