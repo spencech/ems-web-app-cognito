@@ -130,18 +130,11 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
   async onUserPasswordReset() {
 
-    let info = { user: this.user, password: this.model.password!, newPassword: this.model.newPassword };
-
-    if(this.hook) {
-      const proceed = await this.hook({ "state": "reset-password", model: info });
-      if(!proceed) return;
-    }
-    
     this.error = null;
     this.onConnecting.emit(true);
     
     try {
-      const response = await this.cognito.resetPassword(info.user!, info.password, info.newPassword);
+      const response = await this.cognito.resetPassword(this.user!, this.model.password!, this.model.newPassword);
       this.transitioning = true;
       await tick(250);
       this.formType = CognitoFormType.PasswordUpdateSuccessful;
@@ -172,18 +165,20 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
   async onRequestVerificationCode() {
 
+    const username = this.model.username!.replace(/\s+/gim,"");
+    const model = { username };
+
     if(this.hook) {
-      const username = this.model.username!.replace(/\s+/gim,"");
-      const proceed = await this.hook({ "state": "request-verification-code", "username": username });
+      const proceed = await this.hook({ "state": "request-verification-code", "username": username, model });
       if(!proceed) return;
+      this.model.username = model.username;
     }
 
     this.onConnecting.emit(true);
     this.error = null;
     
     try {
-      const username = this.model.username!.replace(/\s+/gim,"");
-      const response = await this.cognito.requestVerificationCode(username);
+      const response = await this.cognito.requestVerificationCode(model.username);
       this.transitioning = true;
       await tick(250);
       this.setMessaging(response, CognitoStrings.onNewPasswordRequired);
