@@ -129,12 +129,19 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   }
 
   async onUserPasswordReset() {
+
+    let info = { user: this.user, password: this.model.password!, newPassword: this.model.newPassword };
+
+    if(this.hook) {
+      const proceed = await this.hook({ "state": "reset-password", model: info });
+      if(!proceed) return;
+    }
     
     this.error = null;
     this.onConnecting.emit(true);
     
     try {
-      const response = await this.cognito.resetPassword(this.user!, this.model.password, this.model.newPassword);
+      const response = await this.cognito.resetPassword(info.user!, info.password, info.newPassword);
       this.transitioning = true;
       await tick(250);
       this.formType = CognitoFormType.PasswordUpdateSuccessful;
