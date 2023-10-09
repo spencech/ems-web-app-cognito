@@ -10,6 +10,12 @@ export function tick(duration: number = 0) {
 		window.setTimeout(() => resolve(duration), duration);
 	});
 }
+
+export function trim(input?: string) {
+    if(!input) return input;
+    return input.replace(/^\s+/, '').replace(/\s+$/, '');
+}
+
 export function params(requestedProperty?: string): any {
   const vars = {} as any;
   const parts = window.location.href.replace(/[?&#]+([^=&]+)=([^&]*)/gi, ((m: any, key: string, value: any) => {

@@ -4,7 +4,7 @@ import { CognitoUser, CognitoUserSession, CognitoIdToken, CognitoAccessToken }  
 import { ICognitoResponse, ICognitoUserData } from "./cognito.interfaces";
 import { CognitoStrings } from "./cognito.classes";
 import { CognitoResponseType, CognitoRequestType, CognitoFormType } from "./cognito.types";
-import { unsnake, tick, params } from "./cognito.utils";
+import { unsnake, tick, params, trim } from "./cognito.utils";
 import { HttpErrorResponse } from '@angular/common/http';
 
 
@@ -76,6 +76,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     
     let response: ICognitoResponse;
     this.error = null;
+    this.model.password = trim(this.model.password);
 
     if(this.hook) {
       const proceed = await this.hook({ "state": "before-login", model: this.model });
@@ -96,6 +97,12 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   async onNewUser() {
     let response: ICognitoResponse;
     this.error = null;
+    this.model.newPassword = trim(this.model.newPassword);
+
+    if(this.hook) {
+      const proceed = await this.hook({ "state": "before-registration", model: this.model });
+      if(!proceed) return;
+    }
     
     try {
       this.onConnecting.emit(true);
@@ -110,7 +117,14 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
   async onForcePasswordReset() {
     
+    this.model.code = trim(this.model.code);
+    this.model.newPassword = trim(this.model.newPassword);
     this.onConnecting.emit(true);
+
+    if(this.hook) {
+      const proceed = await this.hook({ "state": "before-force-password-reset", model: this.model });
+      if(!proceed) return;
+    }
     
     try {
       const response = await this.cognito.confirmPassword(this.cache!.user, this.model.code, this.model.newPassword);
@@ -132,6 +146,14 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
     this.error = null;
     this.onConnecting.emit(true);
+
+    this.model.password = trim(this.model.password);
+    this.model.newPassword = trim(this.model.newPassword);
+
+    if(this.hook) {
+      const proceed = await this.hook({ "state": "before-user-password-reset", model: this.model });
+      if(!proceed) return;
+    }
     
     try {
       const response = await this.cognito.resetPassword(this.user!, this.model.password!, this.model.newPassword);
