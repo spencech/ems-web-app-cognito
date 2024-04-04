@@ -28,6 +28,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @Input("modal-background") modalBackground: string = "rgba(255,255,255,0.5)";
   @Input("z-index") zIndex: number = 1000;
   @Input("hook") hook?: (state: any) => Promise<boolean>;
+  @Input("otp") otp: boolean = false;
 
   @Output("ready") onReady: EventEmitter<any> = new EventEmitter();
   @Output("connecting") onConnecting: EventEmitter<boolean> = new EventEmitter();
@@ -73,6 +74,8 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   }
 
   async login() {
+
+    if(this.otp) return this.getOtp();
     
     let response: ICognitoResponse;
     this.error = null;
@@ -87,6 +90,27 @@ export class CognitoComponent implements OnInit, AfterViewInit {
       const username = this.model.username!.replace(/\s+/gim,"");
       this.onConnecting.emit(true);
       response = await this.cognito.authenticate(username, this.model.password!);
+    } catch(e: any) {
+      response = e;
+    } finally {
+      this.handleResponse(response!);
+    }
+  }
+
+  async getOtp() {
+    let response: ICognitoResponse;
+    this.error = null;
+
+    if(this.hook) {
+      const proceed = await this.hook({ "state": "before-otp-login", model: this.model });
+      if(!proceed) return;
+    }
+
+    try {
+      const username = this.model.username!.replace(/\s+/gim,"");
+      const otp = this.model.otp ? trim(this.model.otp) : undefined;
+      this.onConnecting.emit(true);
+      response  = await this.cognito.otpAuthenticate(username, otp);
     } catch(e: any) {
       response = e;
     } finally {
@@ -253,6 +277,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   }
 
   private async handleResponse(response: ICognitoResponse) {
+
     this.transitioning = true;
     
     await tick(250);
@@ -264,10 +289,13 @@ export class CognitoComponent implements OnInit, AfterViewInit {
       this.connectionComplete(); //likely bad password or too many attempts
     } else if(response.error?.code === CognitoResponseType.ForcePasswordReset && response.request === CognitoRequestType.Authentication) {
       this.initiatePasswordReset(response); //admin has forced user password reset
+    } else if(response.type === CognitoResponseType.OtpChallenge) {
+      this.model.showChallengeEntry = true;
+      this.connectionComplete();
     } else if(response.type === CognitoResponseType.PasswordReset && response.request === CognitoRequestType.Authentication) {
       this.prompt = CognitoStrings.onFirstLogin;
       this.showPasswordResetForm(response); //new user
-    } else if(!response.error?.code && response.request === CognitoRequestType.Authentication) {
+    } else if(!response.error?.code && (response.request === CognitoRequestType.Authentication || response.type === CognitoResponseType.Authenticated )) {
       this.onAuthenticated.emit(this.getUserData()); //connected
       this.showForm = false;
       this.connectionComplete();

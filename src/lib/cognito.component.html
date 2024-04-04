@@ -5,12 +5,19 @@
 		<label class="cognito-label" for="username">{{ strings.labelEmail }}</label>
 		<input id="username" class="cognito-input cognito-text" type="text" name="username" [(ngModel)]="model.username"/>
 	</div>
-	<div class="cognito-formrow">
+	<div *ngIf="!otp" class="cognito-formrow">
 		<label class="cognito-label" for="password">{{ strings.labelPassword }}</label>
 		<input id="password" autocomplete="off" class="cognito-input cognito-text" type="password" name="password" [(ngModel)]="model.password"/>
 	</div>
-	<div class="cognito-buttons">
+	<div *ngIf="!otp" class="cognito-buttons">
 		<button type="button" class="a" (click)="onForgotPassword($event)">{{ strings.labelForgotPassword }}</button>
+		<input class="cognito-input cognito-submit cognito-button" type="submit" [value]="strings.labelSubmit"/>
+	</div>
+	<div *ngIf="otp && model.showChallengeEntry" class="cognito-formrow">
+		<label class="cognito-label" for="otp">Enter the six digit code that was just emailed to you.</label>
+		<input id="otp" autocomplete="off" class="cognito-input cognito-text" type="text" name="otp" [(ngModel)]="model.otp"/>
+	</div>
+	<div *ngIf="otp" class="cognito-buttons">
 		<input class="cognito-input cognito-submit cognito-button" type="submit" [value]="strings.labelSubmit"/>
 	</div>	
 	<div *ngIf="error" class="error" [innerHtml]="error"></div>

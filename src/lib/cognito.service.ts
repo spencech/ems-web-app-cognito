@@ -55,6 +55,29 @@ export class CognitoService {
     this.user?.getSession((e: Error, session: null) => this.sessionSource.next(session));
   }
 
+  public otpAuthenticate(Username: string, ChallengeResponse?: string) {
+    const request = ChallengeResponse ? CognitoRequestType.OtpChallenge : CognitoRequestType.Authentication;
+    const details = new AuthenticationDetails({ Username });
+    const data = { Username, Pool: this.pool };
+    const user = this.user = this.user ?? new CognitoUser(data);
+    this.user.setAuthenticationFlowType('CUSTOM_AUTH');
+
+    return new Promise(async( resolve: (result: any) =>void, reject: (result: any) => void) => {
+      const handler = {
+        onSuccess: (session: CognitoUserSession) => {
+          this.sessionSource.next(session);
+          this.userSource.next(this.user);
+          resolve({ type: CognitoResponseType.Authenticated, session, user, request })
+        },
+        onFailure: (error: any)=> reject({ type: CognitoResponseType.NotAuthorized, error, user, request, session: null }),
+        customChallenge: (challengeParameters: any) => resolve({ type: CognitoResponseType.OtpChallenge, user, request, challengeParameters })
+      };
+      
+      if(ChallengeResponse) user.sendCustomChallengeAnswer(ChallengeResponse, handler);
+      else user.initiateAuth(details, handler);
+    });
+  }
+
   public getUserInfo(url: string): Promise<ICognitoUserData | HttpErrorResponse | undefined> {
     const request = `${url}/oauth2/userInfo`
     const headers = this.headers();

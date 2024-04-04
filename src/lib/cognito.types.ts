@@ -5,6 +5,7 @@ export enum CognitoResponseType {
 	ForcePasswordReset = "PasswordResetRequiredException",
 	InvalidCode = "CodeMismatchException",
 	LimitExceededException = "LimitExceededException",
+	OtpChallenge = "OtpChallenge",
 	Success = "SUCCESS"
 }
 
@@ -15,7 +16,8 @@ export enum CognitoRequestType {
 	ForgotPassword = "forgot-password",
 	UpdatePasswordWithCode = "update-password-with-code",
 	PasswordReset = "password-reset",
-	ConfirmPassword = "confirm-password"
+	ConfirmPassword = "confirm-password",
+	OtpChallenge = "otp-challenge"
 }
 
 export enum CognitoFormType {
