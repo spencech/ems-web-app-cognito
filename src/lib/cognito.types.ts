@@ -6,6 +6,7 @@ export enum CognitoResponseType {
 	InvalidCode = "CodeMismatchException",
 	LimitExceededException = "LimitExceededException",
 	OtpChallenge = "OtpChallenge",
+	MagicLink = "MagicLink",
 	Success = "SUCCESS"
 }
 
@@ -17,7 +18,8 @@ export enum CognitoRequestType {
 	UpdatePasswordWithCode = "update-password-with-code",
 	PasswordReset = "password-reset",
 	ConfirmPassword = "confirm-password",
-	OtpChallenge = "otp-challenge"
+	OtpChallenge = "otp-challenge",
+	MagicLink = "magic-link"
 }
 
 export enum CognitoFormType {

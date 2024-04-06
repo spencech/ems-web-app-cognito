@@ -38,6 +38,8 @@ export class CognitoService {
     //for federated users
     const access = params("access_token") ?? localStorage.getItem("ems_access_token") ?? null;
     const id = params("id_token") ?? localStorage.getItem("ems_id_token") ?? null;
+    const sessionId = params("sessionId") ?? null;
+    const otp = params("otp") ?? null;
 
     if(access && id) {
       localStorage.setItem("ems_access_token", access);
@@ -53,6 +55,34 @@ export class CognitoService {
     this.user = this.pool.getCurrentUser();
     this.userSource.next(this.user);
     this.user?.getSession((e: Error, session: null) => this.sessionSource.next(session));
+  }
+
+  public magicLinkAuthenticate(Username: string, ChallengeResponse?: string, SessionId?: string) {
+    const request = ChallengeResponse ? CognitoRequestType.MagicLink : CognitoRequestType.Authentication;
+    const details = new AuthenticationDetails({ Username });
+    const data = { Username, Pool: this.pool };
+    const user = this.user = this.user ?? new CognitoUser(data);
+    this.user.setAuthenticationFlowType('CUSTOM_AUTH');
+
+    //@ts-ignore
+    if(SessionId) this.user.Session = SessionId;
+
+    return new Promise(async( resolve: (result: any) =>void, reject: (result: any) => void) => {
+      const handler = {
+        onSuccess: (session: CognitoUserSession) => {
+          this.sessionSource.next(session);
+          this.userSource.next(this.user);
+          resolve({ type: CognitoResponseType.Authenticated, session, user, request })
+        },
+        onFailure: (error: any)=> reject({ type: CognitoResponseType.NotAuthorized, error, user, request, session: null }),
+        customChallenge: (challengeParameters: any) => {
+          resolve({ type: CognitoResponseType.MagicLink, user, request, challengeParameters });
+        }
+      };
+      
+      if(ChallengeResponse) user.sendCustomChallengeAnswer(ChallengeResponse, handler);
+      else user.initiateAuth(details, handler);
+    });
   }
 
   public otpAuthenticate(Username: string, ChallengeResponse?: string) {

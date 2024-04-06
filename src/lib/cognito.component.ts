@@ -28,7 +28,11 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @Input("modal-background") modalBackground: string = "rgba(255,255,255,0.5)";
   @Input("z-index") zIndex: number = 1000;
   @Input("hook") hook?: (state: any) => Promise<boolean>;
+  @Input("srp") srp: boolean = true;
   @Input("otp") otp: boolean = false;
+  @Input("magic-link") magicLink: boolean = false;
+  @Input("magic-link-generator") magicLinkGenerator?: Promise<boolean>;
+  @Input("reload-after-link-authentication") reloadAfterLinkAuthentication: boolean = true;
 
   @Output("ready") onReady: EventEmitter<any> = new EventEmitter();
   @Output("connecting") onConnecting: EventEmitter<boolean> = new EventEmitter();
@@ -75,8 +79,6 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
   async login() {
 
-    if(this.otp) return this.getOtp();
-    
     let response: ICognitoResponse;
     this.error = null;
     this.model.password = trim(this.model.password);
@@ -85,7 +87,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
       const proceed = await this.hook({ "state": "before-login", model: this.model });
       if(!proceed) return;
     }
-    
+
     try {
       const username = this.model.username!.replace(/\s+/gim,"");
       this.onConnecting.emit(true);
@@ -101,21 +103,74 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     let response: ICognitoResponse;
     this.error = null;
 
-    if(this.hook) {
-      const proceed = await this.hook({ "state": "before-otp-login", model: this.model });
-      if(!proceed) return;
-    }
-
     try {
       const username = this.model.username!.replace(/\s+/gim,"");
       const otp = this.model.otp ? trim(this.model.otp) : undefined;
+
+      this.srp = false;
+      this.magicLink = false;
+
+      if(this.hook) {
+        const proceed = await this.hook({ "state": "before-otp-request", model: this.model });
+        if(!proceed) return;
+      }
+
       this.onConnecting.emit(true);
+      
       response  = await this.cognito.otpAuthenticate(username, otp);
+
+      if(this.hook) {
+        //@ts-ignore
+        const proceed = await this.hook({ "state": "after-otp-request", model: this.model, sessionId: response.user.Session });
+        if(!proceed) throw new Error("Unable to proceed");
+      }
     } catch(e: any) {
       response = e;
     } finally {
       this.handleResponse(response!);
     }
+  }
+
+  async getMagicLink() {
+    
+    let response: ICognitoResponse;
+    this.error = null;
+
+    try {
+      const username = this.model.username!.replace(/\s+/gim,"");
+      this.onConnecting.emit(true);
+
+      if(this.hook) {
+        const proceed = await this.hook({ "state": "before-magic-link-request", model: this.model });
+        if(!proceed) throw new Error("Unable to proceed");
+      }
+
+      response = await this.cognito.magicLinkAuthenticate(username);
+      
+      if(this.hook) {
+        //@ts-ignore
+        const proceed = await this.hook({ "state": "after-magic-link-request", model: this.model, sessionId: response.user.Session });
+        if(!proceed) throw new Error("Unable to proceed");
+      }
+    } catch(e: any) {
+      response = e;
+    } finally {
+      this.connectionComplete();
+      //this.handleResponse(response!);
+    }
+  }
+
+  async processMagicLink(email: string, code: string, sessionId: string) {
+    try {
+      await this.cognito.magicLinkAuthenticate(email, code, sessionId);
+      if(this.reloadAfterLinkAuthentication) {
+        window.location.href = window.location.origin;
+      } else {
+        this.onAuthenticated.emit(this.getUserData()); //connected
+        this.showForm = false;
+        this.connectionComplete();
+      }
+    } catch(e: any) { } 
   }
 
   async onNewUser() {
