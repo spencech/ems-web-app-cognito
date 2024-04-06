@@ -14,6 +14,7 @@ export class CognitoStrings {
 	 public static labelSubmit: string = "Submit";
 	 public static labelCode: string = "Code";
 	 public static labelClose: string = "Close";
+	 public static labelUseRegularPassword: string = "Use Standard Password";
 	 public static labelOtp: string = "Email me a One Time Password (OTP)";
 	 public static labelOtpEnter: string = "Enter the code that was just emailed to you.";
 	 public static labelMagicLink: string = "Email me a magic link";

@@ -48,7 +48,8 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   public prompt: string | null = null;
   public cache: ICognitoResponse | null = null;
   public strings = CognitoStrings;
-  
+  public showPasswordField: boolean = true;
+
   private session: CognitoUserSession | null = null;
   private user: CognitoUser | null = null;
 
@@ -71,6 +72,10 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     this.cognito.user$.subscribe(user => {
       this.user = user;
     });
+
+    if(this.otp || this.magicLink) {
+      this.showPasswordField = false;
+    }
   }
 
   ngAfterViewInit(): void {
@@ -104,6 +109,8 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     this.error = null;
 
     try {
+      this.onConnecting.emit(true);
+
       const username = this.model.username!.replace(/\s+/gim,"");
       const otp = this.model.otp ? trim(this.model.otp) : undefined;
 
@@ -112,10 +119,8 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
       if(this.hook) {
         const proceed = await this.hook({ "state": "before-otp-request", model: this.model });
-        if(!proceed) return;
+        if(!proceed) return this.connectionComplete();
       }
-
-      this.onConnecting.emit(true);
       
       response  = await this.cognito.otpAuthenticate(username, otp);
 
@@ -142,7 +147,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
       if(this.hook) {
         const proceed = await this.hook({ "state": "before-magic-link-request", model: this.model });
-        if(!proceed) throw new Error("Unable to proceed");
+        if(!proceed) return this.connectionComplete();
       }
 
       response = await this.cognito.magicLinkAuthenticate(username);
@@ -150,18 +155,18 @@ export class CognitoComponent implements OnInit, AfterViewInit {
       if(this.hook) {
         //@ts-ignore
         const proceed = await this.hook({ "state": "after-magic-link-request", model: this.model, sessionId: response.user.Session });
-        if(!proceed) throw new Error("Unable to proceed");
+        if(!proceed) return this.connectionComplete();
       }
     } catch(e: any) {
       response = e;
     } finally {
       this.connectionComplete();
-      //this.handleResponse(response!);
     }
   }
 
   async processMagicLink(email: string, code: string, sessionId: string) {
     try {
+      this.onConnecting.emit(true);
       await this.cognito.magicLinkAuthenticate(email, code, sessionId);
       if(this.reloadAfterLinkAuthentication) {
         window.location.href = window.location.origin;
