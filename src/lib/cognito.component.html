@@ -3,7 +3,7 @@
 	<div *ngIf="prompt" class="prompt" [innerHtml]="prompt"></div>
 	<div class="cognito-formrow">
 		<label class="cognito-label" for="username">{{ strings.labelEmail }}</label>
-		<input id="username" class="cognito-input cognito-text" type="text" name="username" [(ngModel)]="model.username"/>
+		<input id="username" class="cognito-input cognito-text" type="text" name="username" [(ngModel)]="model.username" [disabled]="disableUsername"/>
 	</div>
 	<div *ngIf="!srp && !otp && !passkeys && !magicLink && showEmailSubmitButton" class="cognito-buttons">
 		<button class="cognito-input cognito-submit cognito-button" type="button" (click)="onEnterUsername()" [disabled]="!model.username">{{ strings.labelSubmit }}</button>

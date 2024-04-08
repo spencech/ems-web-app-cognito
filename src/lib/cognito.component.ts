@@ -58,6 +58,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   public strings = CognitoStrings;
   public showPasswordField: boolean = true;
   public showEmailSubmitButton: boolean = true;
+  public disableUsername: boolean = false;
 
   private session: CognitoUserSession | null = null;
   private user: CognitoUser | null = null;
