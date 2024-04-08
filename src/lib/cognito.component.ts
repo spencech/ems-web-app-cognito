@@ -84,7 +84,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
       this.user = user;
     });
 
-    if(this.otp || this.magicLink) {
+    if(this.otp || this.magicLink || this.passkeys) {
       this.showPasswordField = false;
     }
   }
@@ -96,6 +96,12 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   onEnterUsername() {
     this.showEmailSubmitButton = false;
     this.onUsernameEntered.emit(this.model.username!.replace(/\s+/gim,""));
+  }
+
+  updateButtons() {
+    if(this.otp || this.magicLink || this.passkeys) {
+      this.showPasswordField = false;
+    }
   }
 
   async login() {
