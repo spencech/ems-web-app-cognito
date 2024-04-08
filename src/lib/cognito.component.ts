@@ -100,6 +100,16 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
   async login() {
 
+    if(!this.srp && this.otp) {
+      return this.getOtp();
+    } else if(!this.srp && this.magicLink) {
+      return this.getMagicLink();
+    } else if(!this.srp && this.passkey) {
+      return this.getPasskey();
+    } else if(!this.srp) {
+      return this.onEnterUsername();
+    }
+
     let response: ICognitoResponse;
     this.error = null;
     this.model.password = trim(this.model.password);
