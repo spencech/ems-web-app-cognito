@@ -7,6 +7,7 @@ export enum CognitoResponseType {
 	LimitExceededException = "LimitExceededException",
 	OtpChallenge = "OtpChallenge",
 	MagicLink = "MagicLink",
+	Passkey = "Passkey",
 	Success = "SUCCESS"
 }
 
@@ -19,6 +20,7 @@ export enum CognitoRequestType {
 	PasswordReset = "password-reset",
 	ConfirmPassword = "confirm-password",
 	OtpChallenge = "otp-challenge",
+	Passkey = "passkey",
 	MagicLink = "magic-link"
 }
 

@@ -6,7 +6,7 @@
 		<input id="username" class="cognito-input cognito-text" type="text" name="username" [(ngModel)]="model.username"/>
 	</div>
 	<div *ngIf="srp && !showPasswordField" class="cognito-buttons">
-		<button class="cognito-input cognito-submit cognito-button" type="button" (click)="showPasswordField = true; otp = false; magicLink = false" [disabled]="!model.username">{{ strings.labelUseRegularPassword }}</button>
+		<button class="cognito-input cognito-submit cognito-button" type="button" (click)="showPasswordField = true; otp = false; magicLink = false; passkeys = false" [disabled]="!model.username">{{ strings.labelUseRegularPassword }}</button>
 	</div>
 	<div *ngIf="srp && showPasswordField" class="cognito-formrow">
 		<label class="cognito-label" for="password">{{ strings.labelPassword }}</label>
@@ -20,11 +20,18 @@
 		<label class="cognito-label" for="otp">{{ strings.labelOtpEnter }}</label>
 		<input id="otp" autocomplete="off" class="cognito-input cognito-text" type="text" name="otp" [(ngModel)]="model.otp"/>
 	</div>
+	<div *ngIf="passkeys && model.showChallengeEntry" class="cognito-formrow">
+		<label class="cognito-label" for="passkey-reg">{{ strings.labelPasskeyEnter }}</label>
+		<textarea id="passkey-reg" autocomplete="off" class="cognito-input cognito-text" name="passkey-reg" [(ngModel)]="model.passkey"></textarea>
+	</div>
 	<div *ngIf="otp" class="cognito-buttons">
 		<button class="cognito-input cognito-submit cognito-button" type="button" (click)="getOtp()" [disabled]="!model.username">{{ model.showChallengeEntry ? strings.labelSubmit : strings.labelOtp }}</button>
 	</div>	
 	<div *ngIf="magicLink" class="cognito-buttons">
 		<button class="cognito-input cognito-submit cognito-button" type="button" (click)="getMagicLink()" [disabled]="!model.username">{{ strings.labelMagicLink }}</button>
+	</div>	
+	<div *ngIf="passkeys" class="cognito-buttons">
+		<button class="cognito-input cognito-submit cognito-button" type="button" (click)="getPasskey()" [disabled]="!model.username">{{ model.showChallengeEntry ? strings.labelSubmit : strings.labelPasskeys }}</button>
 	</div>	
 	<div *ngIf="error" class="error" [innerHtml]="error"></div>
 </form>
