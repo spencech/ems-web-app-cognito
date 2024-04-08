@@ -45,6 +45,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @Output("connecting") onConnecting: EventEmitter<boolean> = new EventEmitter();
   @Output("authenticated") onAuthenticated: EventEmitter<ICognitoUserData | null> = new EventEmitter();
   @Output("response") onResponse: EventEmitter<any> = new EventEmitter(); 
+  @Output("usernameEntered") onUsernameEntered: EventEmitter<string> = new EventEmitter();
 
   public model: any = { username: null, password: null};
   public componentStyle: Record<string, string | number> = {};
@@ -56,6 +57,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   public cache: ICognitoResponse | null = null;
   public strings = CognitoStrings;
   public showPasswordField: boolean = true;
+  public showEmailSubmitButton: boolean = true;
 
   private session: CognitoUserSession | null = null;
   private user: CognitoUser | null = null;
@@ -89,6 +91,11 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     setTimeout(() => this.initialize());
+  }
+
+  onEnterUsername() {
+    this.showEmailSubmitButton = false;
+    this.onUsernameEntered.emit(this.model.username!.replace(/\s+/gim,""));
   }
 
   async login() {
