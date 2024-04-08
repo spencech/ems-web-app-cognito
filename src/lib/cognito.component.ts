@@ -6,7 +6,7 @@ import { CognitoStrings } from "./cognito.classes";
 import { CognitoResponseType, CognitoRequestType, CognitoFormType } from "./cognito.types";
 import { unsnake, tick, params, trim } from "./cognito.utils";
 import { HttpErrorResponse } from '@angular/common/http';
-
+import { startAuthentication, startRegistration } from '@simplewebauthn/browser';
 
 @Component({
   selector: 'cognito',
@@ -33,6 +33,13 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @Input("magic-link") magicLink: boolean = false;
   @Input("magic-link-generator") magicLinkGenerator?: Promise<boolean>;
   @Input("reload-after-link-authentication") reloadAfterLinkAuthentication: boolean = true;
+  @Input("passkeys") passkeys: boolean = false;
+
+  @Input("passkeys-get-user-id") getUserId!: (username: string) => Promise<string>;
+  @Input("passkeys-generate-authentication-options") generateAuthenticationOptions!: (email: string) => Promise<any>;
+  @Input("passkeys-generate-registration-options") generateRegistrationOptions!: (token: string) => Promise<any>;
+  @Input("passkeys-verify-registration") verifyRegistration!: (input: any, token: string ) => Promise<any>;
+  @Input("passkeys-verify-authentication") verifyAuthentication!: (input: any) => Promise<any>;
 
   @Output("ready") onReady: EventEmitter<any> = new EventEmitter();
   @Output("connecting") onConnecting: EventEmitter<boolean> = new EventEmitter();
@@ -52,6 +59,8 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
   private session: CognitoUserSession | null = null;
   private user: CognitoUser | null = null;
+  public passkeyAuthOptions?: any;
+  public passkeyRegOptions?: any;
 
   constructor(private cognito: CognitoService) {
     
@@ -176,6 +185,58 @@ export class CognitoComponent implements OnInit, AfterViewInit {
         this.connectionComplete();
       }
     } catch(e: any) { } 
+  }
+
+  async getPasskey() {
+    const username = this.model.username!.replace(/\s+/gim,"");
+    this.passkeyAuthOptions = await this.generateAuthenticationOptions(username);
+    
+    const credentials = this.passkeyAuthOptions?.allowCredentials ?? [];
+    if(!credentials.length && !this.model.passkey) this.sendPasskeyCode();
+    else if(!credentials.length) this.registerPasskey();
+    else this.usePasskey();
+  }
+
+  private async sendPasskeyCode() {
+    const username = this.model.username!.replace(/\s+/gim,"");
+    const token = await this.getUserId(username);
+    this.srp = false;
+    this.otp = false;
+    this.magicLink = false;
+    this.model.showChallengeEntry = true;
+  }
+
+  private async usePasskey() {
+    const username = this.model.username!.replace(/\s+/gim,"");
+    this.onConnecting.emit(true);
+    const authentication = await startAuthentication(this.passkeyAuthOptions);
+    const outcome = await this.verifyAuthentication(authentication);
+    await this.cognito.passkeyAuthenticate(username);
+    
+    if(outcome.verified) {
+      await this.cognito.passkeyAuthenticate(username, outcome.uid);
+      this.onAuthenticated.emit(this.getUserData());
+      this.showForm = false;
+      this.connectionComplete();
+    }
+  }
+
+  private async registerPasskey() {
+    const username = this.model.username!.replace(/\s+/gim,"");
+    const code = this.model.passkey!.replace(/\s+/gim,"");
+
+    this.onConnecting.emit(true);
+    const options = await this.generateRegistrationOptions(code);
+    const registration = await startRegistration(options);
+    const outcome = await this.verifyRegistration(registration, code);
+    await this.cognito.passkeyAuthenticate(username);
+    
+    if(outcome.verified) {
+      await this.cognito.passkeyAuthenticate(username, outcome.uid);
+      this.onAuthenticated.emit(this.getUserData());
+      this.showForm = false;
+      this.connectionComplete();
+    }
   }
 
   async onNewUser() {
