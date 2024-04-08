@@ -104,7 +104,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
       return this.getOtp();
     } else if(!this.srp && this.magicLink) {
       return this.getMagicLink();
-    } else if(!this.srp && this.passkey) {
+    } else if(!this.srp && this.passkeys) {
       return this.getPasskey();
     } else if(!this.srp) {
       return this.onEnterUsername();
