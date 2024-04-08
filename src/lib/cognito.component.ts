@@ -84,9 +84,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
       this.user = user;
     });
 
-    if(this.otp || this.magicLink || this.passkeys) {
-      this.showPasswordField = false;
-    }
+    this.updateButtons();
   }
 
   ngAfterViewInit(): void {
