@@ -125,6 +125,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
       this.srp = false;
       this.magicLink = false;
+      this.passkeys = false;
 
       if(this.hook) {
         const proceed = await this.hook({ "state": "before-otp-request", model: this.model });

@@ -6,7 +6,7 @@
 		<input id="username" class="cognito-input cognito-text" type="text" name="username" [(ngModel)]="model.username"/>
 	</div>
 	<div *ngIf="srp && !showPasswordField" class="cognito-buttons">
-		<button class="cognito-input cognito-submit cognito-button" type="button" (click)="showPasswordField = true; otp = false; magicLink = false" [disabled]="!model.username">{{ strings.labelUseRegularPassword }}</button>
+		<button class="cognito-input cognito-submit cognito-button" type="button" (click)="showPasswordField = true; otp = false; magicLink = false; passkeys = false" [disabled]="!model.username">{{ strings.labelUseRegularPassword }}</button>
 	</div>
 	<div *ngIf="srp && showPasswordField" class="cognito-formrow">
 		<label class="cognito-label" for="password">{{ strings.labelPassword }}</label>
