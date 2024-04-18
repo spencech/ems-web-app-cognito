@@ -6,8 +6,8 @@
   "funding": "https://paypal.me/spencech",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "^13.2.0",
-    "@angular/core": "^13.2.0",
+    "@angular/common": "^13.2.0 || ^14.0.0",
+    "@angular/core": "^13.2.0 || ^14.0.0",
     "@simplewebauthn/browser": "^9.0.1",
     "amazon-cognito-identity-js": "^6.3.12",
     "aws-sdk": "^2.1171.0",
