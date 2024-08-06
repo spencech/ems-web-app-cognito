@@ -8,7 +8,7 @@ import { ICognitoResponse, ICognitoUserData } from "./cognito.interfaces";
 import { CognitoResponseType, CognitoRequestType, CognitoFormType } from "./cognito.types";
 import { EphemeralStorage } from "./cognito.classes";
 import { params } from "./cognito.utils";
-import { default as jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 @Injectable({
   providedIn: 'root'
