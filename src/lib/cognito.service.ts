@@ -35,7 +35,7 @@ export class CognitoService {
 
   }
 
-  public initialize(UserPoolId: string, ClientId: string, useLocalStorage?: boolean, idToken?: string accessToken?: string, refreshToken?: string ) {
+  public initialize(UserPoolId: string, ClientId: string, useLocalStorage?: boolean, idToken?: string, accessToken?: string, refreshToken?: string ) {
 
     //for federated users
     const access = params("access_token") ?? accessToken ?? localStorage.getItem("ems_access_token") ?? null;
@@ -70,7 +70,7 @@ export class CognitoService {
       const decoded = jwtDecode(idToken);
 
       console.log(decoded);
-      
+
       const Storage = new EphemeralStorage();
       
       this.pool = new CognitoUserPool({ UserPoolId, ClientId, Storage });
