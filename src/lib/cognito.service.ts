@@ -101,7 +101,7 @@ export class CognitoService {
   public magicLinkAuthenticate(Username: string, ChallengeResponse?: string, SessionId?: string) {
     const request = ChallengeResponse ? CognitoRequestType.MagicLink : CognitoRequestType.Authentication;
     const details = new AuthenticationDetails({ Username });
-    const data = { Username, Pool: this.pool };
+    const data = { Username, Pool: this.pool, Storage: undefined };
     if(!this.useLocalStorage) data.Storage = this.storage;
     const user = this.user = this.user ?? new CognitoUser(data);
     this.user.setAuthenticationFlowType('CUSTOM_AUTH');
@@ -130,7 +130,7 @@ export class CognitoService {
   public passkeyAuthenticate(Username: string, ChallengeResponse?: string) {
     const request = ChallengeResponse ? CognitoRequestType.Passkey : CognitoRequestType.Authentication;
     const details = new AuthenticationDetails({ Username });
-    const data = { Username, Pool: this.pool };
+    const data = { Username, Pool: this.pool, Storage: undefined };
     if(!this.useLocalStorage) data.Storage = this.storage;
     const user = this.user = this.user ?? new CognitoUser(data);
     this.user.setAuthenticationFlowType('CUSTOM_AUTH');
@@ -154,7 +154,7 @@ export class CognitoService {
   public otpAuthenticate(Username: string, ChallengeResponse?: string) {
     const request = ChallengeResponse ? CognitoRequestType.OtpChallenge : CognitoRequestType.Authentication;
     const details = new AuthenticationDetails({ Username });
-    const data = { Username, Pool: this.pool };
+    const data = { Username, Pool: this.pool, Storage: undefined };
     if(!this.useLocalStorage) data.Storage = this.storage;
     const user = this.user = this.user ?? new CognitoUser(data);
     this.user.setAuthenticationFlowType('CUSTOM_AUTH');
@@ -230,7 +230,7 @@ export class CognitoService {
 
   public authenticate(Username: string, Password: string): Promise<ICognitoResponse> {
     const details = new AuthenticationDetails({ Username, Password});
-    const data = { Username, Pool: this.pool };
+    const data = { Username, Pool: this.pool, Storage: undefined };
     if(!this.useLocalStorage) data.Storage = this.storage;
     const user = new CognitoUser(data);
     return new Promise((resolve: (result: any) => void, reject: (result: any) => void) => {
@@ -247,7 +247,7 @@ export class CognitoService {
     });
 
     const Username = session.getIdToken().payload["cognito:username"];
-    const data = { Username, Pool: this.pool };
+    const data = { Username, Pool: this.pool, Storage: undefined };
     if(!this.useLocalStorage) data.Storage = this.storage;
     this.user = new CognitoUser(data);
     this.userSource.next(this.user);
@@ -270,7 +270,7 @@ export class CognitoService {
   }
 
   public requestVerificationCode(Username: string): Promise<ICognitoResponse> {
-    const data = { Username, Pool: this.pool };
+    const data = { Username, Pool: this.pool, Storage: undefined };
     if(!this.useLocalStorage) data.Storage = this.storage;
     const user = new CognitoUser(data);
     return this.forgotPassword(user);
