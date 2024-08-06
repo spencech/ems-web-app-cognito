@@ -37,7 +37,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @Input("useLocalStorage") useLocalStorage: boolean = true;
   @Input("idToken") idToken: string | null = null;
   @Input("accessToken") accessToken: string | null = null;
-  @Input("refreshToken") accessToken: string | null = null;
+  @Input("refreshToken") refreshToken: string | null = null;
 
   @Input("passkeys-get-user-id") getUserId!: (username: string) => Promise<string>;
   @Input("passkeys-generate-authentication-options") generateAuthenticationOptions!: (email: string) => Promise<any>;
