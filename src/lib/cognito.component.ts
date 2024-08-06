@@ -34,6 +34,10 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @Input("magic-link-generator") magicLinkGenerator?: Promise<boolean>;
   @Input("reload-after-link-authentication") reloadAfterLinkAuthentication: boolean = true;
   @Input("passkeys") passkeys: boolean = false;
+  @Input("useLocalStorage") useLocalStorage: boolean = true;
+  @Input("idToken") idToken: string | null = null;
+  @Input("accessToken") accessToken: string | null = null;
+  @Input("refreshToken") accessToken: string | null = null;
 
   @Input("passkeys-get-user-id") getUserId!: (username: string) => Promise<string>;
   @Input("passkeys-generate-authentication-options") generateAuthenticationOptions!: (email: string) => Promise<any>;
@@ -71,7 +75,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     
-    this.cognito.initialize(this.poolId, this.clientId);
+    this.cognito.initialize(this.poolId, this.clientId, this.useLocalStorage, this.idToken, this.accessToken);
 
     this.cognito.form$.subscribe(form => {
       this.formType = form;
@@ -398,8 +402,6 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   }
 
   private async initialize() {
-
-
     try {
       if(this.cognitoUrl && localStorage.getItem("ems_access_token")) {
         

@@ -6,7 +6,9 @@ import 'cross-fetch/polyfill';
 import { CognitoUser, CognitoUserPool, CognitoUserSession, CognitoIdToken, CognitoAccessToken, CognitoRefreshToken, AuthenticationDetails }  from 'amazon-cognito-identity-js';
 import { ICognitoResponse, ICognitoUserData } from "./cognito.interfaces";
 import { CognitoResponseType, CognitoRequestType, CognitoFormType } from "./cognito.types";
+import { EphemeralStorage } from "./cognito.classes";
 import { params } from "./cognito.utils";
+import { default as jwtDecode } from "jwt-decode";
 
 @Injectable({
   providedIn: 'root'
@@ -33,15 +35,15 @@ export class CognitoService {
 
   }
 
-  public initialize(UserPoolId: string, ClientId: string) {
+  public initialize(UserPoolId: string, ClientId: string, useLocalStorage?: boolean, idToken?: string accessToken?: string, refreshToken?: string ) {
 
     //for federated users
-    const access = params("access_token") ?? localStorage.getItem("ems_access_token") ?? null;
-    const id = params("id_token") ?? localStorage.getItem("ems_id_token") ?? null;
+    const access = params("access_token") ?? accessToken ?? localStorage.getItem("ems_access_token") ?? null;
+    const id = params("id_token") ?? idToken ?? localStorage.getItem("ems_id_token") ?? null;
     const sessionId = params("sessionId") ?? null;
     const otp = params("otp") ?? null;
 
-    if(access && id) {
+    if(useLocalStorage && access && id) {
       localStorage.setItem("ems_access_token", access);
       localStorage.setItem("ems_id_token", id);
       window.location.hash = "";
@@ -51,11 +53,51 @@ export class CognitoService {
     this.idToken = id;
 
     //for srp users
-    this.pool = new CognitoUserPool({ UserPoolId, ClientId });
-    this.user = this.pool.getCurrentUser();
-    this.userSource.next(this.user);
-    this.user?.getSession((e: Error, session: null) => this.sessionSource.next(session));
+    if(useLocalStorage) {
+      this.pool = new CognitoUserPool({ UserPoolId, ClientId });
+      this.user = this.pool.getCurrentUser();
+      this.userSource.next(this.user);
+      this.user?.getSession((e: Error, session: null) => this.sessionSource.next(session));
+    } else {
+      this.setCognitoUserFromToken(UserPoolId, ClientId, idToken, accessToken, refreshToken);
+    }
+    
   }
+
+  public setCognitoUserFromToken (UserPoolId: string, ClientId: string, idToken?: string, accessToken?: string, refreshToken?: string) {
+      console.log("using ephemeral storage");
+
+      const decoded = jwtDecode(idToken);
+
+      console.log(decoded);
+      
+      const Storage = new EphemeralStorage();
+      
+      this.pool = new CognitoUserPool({ UserPoolId, ClientId, Storage });
+      
+      if(idToken) {
+        this.user = new CognitoUser({
+            Username: decoded['cognito:username'],
+            Pool: this.pool, 
+            Storage
+        });
+
+        const idTokenObj = new CognitoIdToken({ IdToken: idToken });
+        const accessTokenObj = new CognitoAccessToken({ AccessToken: accessToken });
+        const refreshTokenObj = new CognitoRefreshToken({ RefreshToken: refreshToken });
+        const session = new CognitoUserSession({ IdToken: idTokenObj, AccessToken: accessTokenObj, RefreshToken: refreshTokenObj });
+
+        // Set the session to the Cognito user
+        this.user.setSignInUserSession(session);
+        
+      } else {
+        this.user = this.pool.getCurrentUser();
+      }
+      
+      this.userSource.next(this.user);
+      this.user.getSession((e: Error, session: null) => this.sessionSource.next(session));
+      return cognitoUser;
+  };
 
   public magicLinkAuthenticate(Username: string, ChallengeResponse?: string, SessionId?: string) {
     const request = ChallengeResponse ? CognitoRequestType.MagicLink : CognitoRequestType.Authentication;
