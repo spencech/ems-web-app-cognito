@@ -67,15 +67,12 @@ export class CognitoService {
   public setCognitoUserFromToken (UserPoolId: string, ClientId: string, idToken?: string, accessToken?: string, refreshToken?: string) {
       console.log("using ephemeral storage");
 
-      const decoded = jwtDecode(idToken);
-
-      console.log(decoded);
-
       const Storage = new EphemeralStorage();
-      
       this.pool = new CognitoUserPool({ UserPoolId, ClientId, Storage });
       
       if(idToken) {
+        const decoded = jwtDecode(idToken);
+        console.log(decoded);
         this.user = new CognitoUser({
             Username: decoded['cognito:username'],
             Pool: this.pool, 
@@ -83,8 +80,8 @@ export class CognitoService {
         });
 
         const idTokenObj = new CognitoIdToken({ IdToken: idToken });
-        const accessTokenObj = new CognitoAccessToken({ AccessToken: accessToken });
-        const refreshTokenObj = new CognitoRefreshToken({ RefreshToken: refreshToken });
+        const accessTokenObj = new CognitoAccessToken({ AccessToken: accessToken! });
+        const refreshTokenObj = new CognitoRefreshToken({ RefreshToken: refreshToken! });
         const session = new CognitoUserSession({ IdToken: idTokenObj, AccessToken: accessTokenObj, RefreshToken: refreshTokenObj });
 
         // Set the session to the Cognito user
