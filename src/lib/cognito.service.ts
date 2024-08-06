@@ -72,7 +72,6 @@ export class CognitoService {
       
       if(idToken) {
         const decoded: any = jwtDecode(idToken);
-        console.log(decoded);
         this.user = new CognitoUser({
             Username: decoded['cognito:username'],
             Pool: this.pool, 
@@ -88,7 +87,10 @@ export class CognitoService {
         this.user.setSignInUserSession(session);
         
       } else {
-        this.user = this.pool.getCurrentUser();
+        this.user = new CognitoUser({
+            Pool: this.pool, 
+            Storage
+        });
       }
       
       this.userSource.next(this.user);
