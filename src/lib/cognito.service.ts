@@ -71,7 +71,7 @@ export class CognitoService {
       this.pool = new CognitoUserPool({ UserPoolId, ClientId, Storage });
       
       if(idToken) {
-        const decoded = jwtDecode(idToken);
+        const decoded: any = jwtDecode(idToken);
         console.log(decoded);
         this.user = new CognitoUser({
             Username: decoded['cognito:username'],
@@ -92,8 +92,8 @@ export class CognitoService {
       }
       
       this.userSource.next(this.user);
-      this.user.getSession((e: Error, session: null) => this.sessionSource.next(session));
-      return cognitoUser;
+      this.user?.getSession((e: Error, session: null) => this.sessionSource.next(session));
+      return this.user;
   };
 
   public magicLinkAuthenticate(Username: string, ChallengeResponse?: string, SessionId?: string) {

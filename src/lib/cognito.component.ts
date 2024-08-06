@@ -75,7 +75,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     
-    this.cognito.initialize(this.poolId, this.clientId, this.useLocalStorage, this.idToken, this.accessToken);
+    this.cognito.initialize(this.poolId, this.clientId, this.useLocalStorage, this.idToken, this.accessToken, this.refreshToken);
 
     this.cognito.form$.subscribe(form => {
       this.formType = form;
