@@ -28,23 +28,19 @@ export class EphemeralStorage {
 	private _cache: any = {};
 
 	getItem(key: string): any {
-		console.log(`getting: ${key}: ${this._cache[key]}`, this._cache);
 		return this._cache[key];
 	}
 
 	setItem(key: string, value: any):string {
-		console.log(`setting: ${key}: ${value}`);
 		this._cache[key] = value;
 		return this.getItem(key);
 	}
 
 	removeItem(key: string) {
 		delete this._cache[key];
-		console.log(`deleting: ${key}`, this._cache);
 	}
 
 	clear() {
 		this._cache= {};
-		console.log(`clearing`, this._cache);
 	}
 }

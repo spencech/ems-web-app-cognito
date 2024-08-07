@@ -69,8 +69,6 @@ export class CognitoService {
   }
 
   public setCognitoUserFromToken (UserPoolId: string, ClientId: string, idToken?: string, accessToken?: string, refreshToken?: string) {
-      console.log("using ephemeral storage");
-
       this.pool = new CognitoUserPool({ UserPoolId, ClientId, Storage: this.storage });
       
       if(idToken) {
