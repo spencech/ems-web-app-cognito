@@ -9,7 +9,7 @@
 		<button class="cognito-input cognito-submit cognito-button" type="button" (click)="onEnterUsername()" [disabled]="!model.username">{{ strings.labelSubmit }}</button>
 	</div>
 	<div *ngIf="srp && !showPasswordField" class="cognito-buttons">
-		<button class="cognito-input cognito-submit cognito-button" type="button" (click)="showPasswordField = true; otp = false; magicLink = false; passkeys = false" [disabled]="!model.username">{{ strings.labelUseRegularPassword }}</button>
+		<button class="cognito-input cognito-submit cognito-button" type="button" (click)="showPasswordField = true; otp = false; magicLink = false; passkeys = false; sso = false;" [disabled]="!model.username">{{ strings.labelUseRegularPassword }}</button>
 	</div>
 	<div *ngIf="srp && showPasswordField" class="cognito-formrow">
 		<label class="cognito-label" for="password">{{ strings.labelPassword }}</label>
@@ -35,6 +35,9 @@
 	</div>	
 	<div *ngIf="passkeys" class="cognito-buttons">
 		<button class="cognito-input cognito-submit cognito-button" type="button" (click)="getPasskey()" [disabled]="!model.username">{{ model.showChallengeEntry ? strings.labelSubmit : strings.labelPasskeys }}</button>
+	</div>	
+	<div *ngIf="sso && ssoLink" class="cognito-buttons">
+		<a class="cognito-input cognito-submit cognito-button" type="button" [href]="ssoLink">{{ strings.labelSso }}</button>
 	</div>	
 	<div *ngIf="error" class="error" [innerHtml]="error"></div>
 </form>

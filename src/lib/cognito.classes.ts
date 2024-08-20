@@ -21,6 +21,7 @@ export class CognitoStrings {
 	 public static labelPasskeys: string = "Use a passkey";
 	 public static labelPasskeyEnter: string = "Enter the code that was just emailed to you."
 	 public static labelPasswordRequirement: string = "Must be at least 8 characters and contain a number, special character, uppercase and lowercase letter.";
+	 public static labelSso: string = "SSO";
 }
 
 

@@ -30,6 +30,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @Input("hook") hook?: (state: any) => Promise<boolean>;
   @Input("srp") srp: boolean = true;
   @Input("otp") otp: boolean = false;
+  @Input("sso") sso: boolean = false;
   @Input("magic-link") magicLink: boolean = false;
   @Input("magic-link-generator") magicLinkGenerator?: Promise<boolean>;
   @Input("reload-after-link-authentication") reloadAfterLinkAuthentication: boolean = true;
@@ -38,6 +39,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @Input("idToken") idToken: string | undefined;
   @Input("accessToken") accessToken: string | undefined;
   @Input("refreshToken") refreshToken: string | undefined;
+  @Input("sso-link") ssoLink: string | undefined;
 
   @Input("passkeys-get-user-id") getUserId!: (username: string) => Promise<string>;
   @Input("passkeys-generate-authentication-options") generateAuthenticationOptions!: (email: string) => Promise<any>;
