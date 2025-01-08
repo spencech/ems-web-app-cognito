@@ -6,8 +6,8 @@
   "funding": "https://paypal.me/spencech",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "^13.2.0 || ^14.0.0 || ^15.0.0 || ^16.0.0  || ^17.0.0  || ^18.0.0",
-    "@angular/core": "^13.2.0  || ^14.0.0 || ^15.0.0 || ^16.0.0  || ^17.0.0  || ^18.0.0",
+    "@angular/common": "^13.2.0 || ^14.0.0 || ^15.0.0 || ^16.0.0  || ^17.0.0  || ^18.0.0  || ^19.0.0",
+    "@angular/core": "^13.2.0  || ^14.0.0 || ^15.0.0 || ^16.0.0  || ^17.0.0  || ^18.0.0  || ^19.0.0",
     "@simplewebauthn/browser": "^9.0.1",
     "amazon-cognito-identity-js": "^6.3.12",
     "aws-sdk": "^2.1171.0",
@@ -22,7 +22,7 @@
     "url": "https://github.com/spencech/ems-web-app-cognito.git"
   },
   "scripts": {
-    "publish": "git add -A . && git commit --allow-empty -m 'prepublish npm package' && npm version patch && ng build cognito && cd dist && npm publish"
+    "publish-npm": "git add -A . && git commit --allow-empty -m 'prepublish npm package' && npm version patch && ng build cognito && cd dist && npm publish"
   },
   "keywords": [
     "ems",
