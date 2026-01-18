@@ -18,9 +18,15 @@
 	<div *ngIf="srp && showPasswordField" class="cognito-buttons">
 		<button type="button" class="a" (click)="onForgotPassword($event)">{{ strings.labelForgotPassword }}</button>
 		<input class="cognito-input cognito-submit cognito-button" type="submit" [value]="strings.labelSubmit"/>
-		<button *ngFor="let provider of ssoProviders" type="button" class="cognito-input cognito-button cognito-sso-provider" (click)="selectProvider(provider.id)">
-			<img [src]="provider.icon" [alt]="provider.label" class="cognito-sso-icon" /><span>{{ provider.label }}</span>
-		</button>
+	</div>
+	<div *ngIf="ssoProviders.length" class="cognito-sso-section">
+		<hr class="cognito-sso-divider" />
+		<p class="cognito-sso-label">{{ strings.labelOrSignInWith }}</p>
+		<div class="cognito-sso-buttons">
+			<button *ngFor="let provider of ssoProviders" type="button" class="cognito-input cognito-button cognito-sso-provider" (click)="selectProvider(provider.id)">
+				<img [src]="provider.icon" [alt]="provider.label" class="cognito-sso-icon" /><span>{{ provider.label }}</span>
+			</button>
+		</div>
 	</div>
 	<div *ngIf="otp && model.showChallengeEntry" class="cognito-formrow">
 		<label class="cognito-label" for="otp">{{ strings.labelOtpEnter }}</label>
