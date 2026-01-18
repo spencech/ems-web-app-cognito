@@ -1,7 +1,7 @@
 import { Component, OnInit, HostBinding, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
 import { CognitoService } from "./cognito.service";
 import { CognitoUser, CognitoUserSession, CognitoIdToken, CognitoAccessToken }  from 'amazon-cognito-identity-js';
-import { ICognitoResponse, ICognitoUserData } from "./cognito.interfaces";
+import { ICognitoResponse, ICognitoUserData, ISSOProvider } from "./cognito.interfaces";
 import { CognitoStrings } from "./cognito.classes";
 import { CognitoResponseType, CognitoRequestType, CognitoFormType } from "./cognito.types";
 import { unsnake, tick, params, trim } from "./cognito.utils";
@@ -40,6 +40,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @Input("accessToken") accessToken: string | undefined;
   @Input("refreshToken") refreshToken: string | undefined;
   @Input("sso-link") ssoLink: string | undefined;
+  @Input("sso-providers") ssoProviders: ISSOProvider[] = [];
 
   @Input("passkeys-get-user-id") getUserId!: (username: string) => Promise<string>;
   @Input("passkeys-generate-authentication-options") generateAuthenticationOptions!: (email: string) => Promise<any>;
@@ -52,6 +53,7 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   @Output("authenticated") onAuthenticated: EventEmitter<ICognitoUserData | null> = new EventEmitter();
   @Output("response") onResponse: EventEmitter<any> = new EventEmitter(); 
   @Output("usernameEntered") onUsernameEntered: EventEmitter<string> = new EventEmitter();
+  @Output("providerSelect") onProviderSelect: EventEmitter<string> = new EventEmitter();
 
   public model: any = { username: null, password: null};
   public componentStyle: Record<string, string | number> = {};
@@ -101,6 +103,10 @@ export class CognitoComponent implements OnInit, AfterViewInit {
   onEnterUsername() {
     this.showEmailSubmitButton = false;
     this.onUsernameEntered.emit(this.model.username!.replace(/\s+/gim,""));
+  }
+
+  selectProvider(providerId: string) {
+    this.onProviderSelect.emit(providerId);
   }
 
   updateButtons() {

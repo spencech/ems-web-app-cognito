@@ -20,3 +20,9 @@ export interface ICognitoUserData {
 	firstName: string,
 	lastName: string
 }
+
+export interface ISSOProvider {
+	id: string,
+	label: string,
+	icon: string
+}
