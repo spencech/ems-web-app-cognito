@@ -166,10 +166,45 @@
 	justify-content: center;
 	gap: 0.5rem;
 	cursor: pointer;
+	position: relative;
 }
 
 .cognito-sso-icon {
 	width: 1.25rem;
 	height: 1.25rem;
 	object-fit: contain;
+}
+
+.cognito-sso-tooltip {
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+	margin-bottom: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	background: rgba(0, 0, 0, 0.9);
+	color: white;
+	font-size: 0.875rem;
+	white-space: nowrap;
+	border-radius: 0.25rem;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+	transform: translateX(-50%) translateY(-0.25rem);
+	z-index: 1000;
+}
+
+.cognito-sso-tooltip:after {
+	content: '';
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+	border: 0.375rem solid transparent;
+	border-top-color: rgba(0, 0, 0, 0.9);
+}
+
+.cognito-sso-provider:hover .cognito-sso-tooltip {
+	opacity: 1;
+	transform: translateX(-50%) translateY(0);
 }

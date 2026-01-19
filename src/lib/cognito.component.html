@@ -23,8 +23,9 @@
 		<hr class="cognito-sso-divider" />
 		<p class="cognito-sso-label">{{ strings.labelOrSignInWith }}</p>
 		<div class="cognito-sso-buttons">
-			<button *ngFor="let provider of ssoProviders" type="button" class="cognito-input cognito-button cognito-sso-provider" (click)="selectProvider(provider.id)">
+			<button *ngFor="let provider of ssoProviders" type="button" class="cognito-input cognito-button cognito-sso-provider" (click)="selectProvider(provider.id)" [attr.title]="provider.hoverText || null">
 				<img [src]="provider.icon" [alt]="provider.label" class="cognito-sso-icon" /><span>{{ provider.label }}</span>
+				<span *ngIf="provider.hoverText" class="cognito-sso-tooltip">{{ provider.hoverText }}</span>
 			</button>
 		</div>
 	</div>

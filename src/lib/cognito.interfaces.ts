@@ -24,5 +24,6 @@ export interface ICognitoUserData {
 export interface ISSOProvider {
 	id: string,
 	label: string,
-	icon: string
+	icon: string,
+	hoverText?: string
 }
