@@ -105,8 +105,16 @@ export class CognitoComponent implements OnInit, AfterViewInit {
     this.onUsernameEntered.emit(this.model.username!.replace(/\s+/gim,""));
   }
 
-  selectProvider(providerId: string) {
+  selectProvider(providerId: string, event?: Event) {
+    if(event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.onProviderSelect.emit(providerId);
+  }
+
+  trackByProviderId(index: number, provider: ISSOProvider): string {
+    return provider.id;
   }
 
   updateButtons() {
